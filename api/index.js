@@ -1,18 +1,32 @@
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
 const serverless = require("serverless-http");
-const app = require("../app");
-const { connectDB, initDB } = require("../db");
 
-let initialized = false;
+const apiRoutes = require("./api");
 
-async function bootstrap() {
-  if (!initialized) {
-    await connectDB();
-    await initDB();
-    initialized = true;
-  }
-}
+const app = express();
 
-module.exports = async (req, res) => {
-  await bootstrap();
-  return serverless(app)(req, res);
-};
+/* ---------- MIDDLEWARE ---------- */
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* ---------- ROUTES ---------- */
+app.get("/", (_req, res) => {
+  res.send("Hello World!");
+});
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "UP",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.use("/api", apiRoutes);
+
+/* ---------- EXPORT ---------- */
+module.exports = serverless(app);
