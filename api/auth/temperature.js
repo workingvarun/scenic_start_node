@@ -1,7 +1,7 @@
 const axios = require("axios");
 const temperatureRouter = require("express").Router();
-const cache = new Map(); 
-const CACHE_TTL = 5 * 60 * 1000; 
+const cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000;
 
 /**
  * @swagger
@@ -15,8 +15,7 @@ const CACHE_TTL = 5 * 60 * 1000;
  */
 temperatureRouter.get("/", async (req, res) => {
   let clientIP =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
-    req.socket.remoteAddress;
+    req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 
   const cached = cache.get(clientIP);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
@@ -32,7 +31,8 @@ temperatureRouter.get("/", async (req, res) => {
     const weatherData = await fetchWeatherInfo(latlongData);
 
     cache.set(clientIP, { data: weatherData, timestamp: Date.now() });
-
+    weatherData.timestamp = cache.get(clientIP).timestamp;
+    
     return res.status(200).json(weatherData);
   } catch (err) {
     console.error("Temperature error:", err.message);
@@ -58,7 +58,7 @@ async function fetchWeatherInfo({ latitude, longitude }) {
       params: {
         lat: latitude,
         lon: longitude,
-        exclude:"minutely,alerts",
+        exclude: "minutely,alerts",
         appid: process.env.OPENWEATHER_API,
         units: "metric",
       },
