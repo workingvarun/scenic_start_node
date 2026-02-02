@@ -35,13 +35,7 @@ temperatureRouter.get("/", async (req, res) => {
     const weatherData = await fetchWeatherInfo(latlongData);
 
     // Return only what you actually need
-    return res.status(200).json({
-      location: weatherData.name,
-      temperature: weatherData.main?.temp,
-      feelsLike: weatherData.main?.feels_like,
-      humidity: weatherData.main?.humidity,
-      description: weatherData.weather?.[0]?.description,
-    });
+    return res.status(200).json(weatherData);
   } catch (err) {
     console.error("Temperature error:", err.message);
     return res
