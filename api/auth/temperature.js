@@ -53,7 +53,7 @@ async function fetchLatLong(IP) {
 
 async function fetchWeatherInfo({ latitude, longitude }) {
   const { data } = await axios.get(
-    "https://api.openweathermap.org/data/3.0/onecall",
+    "https://api.openweathermap.org/data/2.5/weather",
     {
       params: {
         lat: latitude,
